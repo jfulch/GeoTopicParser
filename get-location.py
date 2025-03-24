@@ -61,10 +61,10 @@ def extract_locations(text):
 
 def main():
     # Read the TSV file
-    df = pd.read_csv('haunted_places.tsv', sep='\t')
+    df = pd.read_csv('haunted_places_all_records_combined.tsv', sep='\t')
     
     # Limit to first 500 rows
-    df = df.head(500)
+    df = df.head(12000)
     
     # Create a copy of the dataframe to preserve the original
     augmented_df = df.copy()
@@ -73,6 +73,10 @@ def main():
     augmented_df['extracted_location_name'] = None
     augmented_df['extracted_latitude'] = None
     augmented_df['extracted_longitude'] = None
+    augmented_df['location_source'] = None  # New column to track source
+    
+    # List to store all found locations for CSV export
+    all_locations = []
     
     # Process each description
     for index, row in df.iterrows():
@@ -91,6 +95,17 @@ def main():
                 
             # Extract locations from this description
             locations = extract_locations(enhanced_description)
+            
+            # Add ALL found locations to our list for CSV export
+            for loc in locations:
+                all_locations.append({
+                    'original_index': index,
+                    'location_name': loc['name'],
+                    'latitude': loc['latitude'],
+                    'longitude': loc['longitude'],
+                    'city': row.get('city', ''),
+                    'state': row.get('state', '')
+                })
             
             selected_location = None
             
@@ -130,6 +145,7 @@ def main():
                 augmented_df.at[index, 'extracted_location_name'] = selected_location['name']
                 augmented_df.at[index, 'extracted_latitude'] = selected_location['latitude']
                 augmented_df.at[index, 'extracted_longitude'] = selected_location['longitude']
+                augmented_df.at[index, 'location_source'] = 'description'  # Location found via description
             else:
                 # Fallback: Use the location from the original data if no locations were extracted
                 if not pd.isna(row.get('location')) and not pd.isna(row.get('latitude')) and not pd.isna(row.get('longitude')):
@@ -137,19 +153,34 @@ def main():
                     augmented_df.at[index, 'extracted_location_name'] = row.get('location')
                     augmented_df.at[index, 'extracted_latitude'] = row.get('latitude')
                     augmented_df.at[index, 'extracted_longitude'] = row.get('longitude')
+                    augmented_df.at[index, 'location_source'] = 'original'  # Location from original data
     
     # Save the augmented dataframe to a new TSV file
     augmented_df.to_csv('haunted_places_augmented.tsv', sep='\t', index=False)
-    print(f"Original data plus extracted locations saved to haunted_places_augmented.tsv")
     
-    # Calculate how many locations were successfully extracted
-    extracted_count = augmented_df['extracted_location_name'].notna().sum()
-    print(f"Successfully extracted locations for {extracted_count}/{len(df)} rows")
+    # Save ALL found locations to CSV
+    if all_locations:
+        all_locations_df = pd.DataFrame(all_locations)
+        all_locations_df.to_csv('haunted_places_locations.csv', index=False)
+        print(f"All {len(all_locations)} extracted locations saved to haunted_places_locations.csv")
+    else:
+        print("No locations were found to save to CSV")
+    
+    # Calculate statistics
+    total_rows = len(df)
+    extracted_count = (augmented_df['location_source'] == 'description').sum()
+    fallback_count = (augmented_df['location_source'] == 'original').sum()
+    
+    print(f"\nLocation Extraction Statistics:")
+    print(f"Total rows processed: {total_rows}")
+    print(f"Locations found via description: {extracted_count} ({extracted_count/total_rows*100:.1f}%)")
+    print(f"Locations from original data: {fallback_count} ({fallback_count/total_rows*100:.1f}%)")
+    print(f"Rows with no location data: {total_rows - extracted_count - fallback_count}")
     
     # Print a sample of the results
     print("\nSample of augmented data:")
     columns_to_show = ['city', 'state', 'location', 'extracted_location_name', 
-                      'extracted_latitude', 'extracted_longitude']
+                       'extracted_latitude', 'extracted_longitude', 'location_source']
     print(augmented_df[columns_to_show].head())
 
 if __name__ == "__main__":

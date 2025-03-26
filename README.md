@@ -1,5 +1,9 @@
 # GeoTopicParser
 
+## How to Run get-location.py
+
+Before running the `get-location.py` you have to start the Tika server and the lucene-geo-gazetteer server, using the below commands.
+
 ```bash
 cd ~/lucene-geo-gazetteer
 lucene-geo-gazetteer -server
@@ -40,4 +44,16 @@ Sample Output:
 ]
 ```
 
-curl -T polar.geot -H "Content-Disposition: attachment; filename=test.geot" http://localhost:9998/rmeta | jq
+## How to run analyze-images.py
+
+```bash
+docker run -p 8764:8764 uscdatascience/im2txt-rest-tika
+```
+
+```bash
+docker run -p 9998:9998 apache/tika
+```
+
+```bash
+python scripts/analyze-images.py
+```

@@ -5,8 +5,8 @@ import json
 from PIL import Image
 
 # Local paths
-LOCAL_IMAGES_DIR = "C:/Users/JasonUngheanu/Desktop/GeoTopicParser/generated_images"
-CSV_PATH = "C:/Users/JasonUngheanu/Desktop/GeoTopicParser/processed_image_data.csv"
+LOCAL_IMAGES_DIR = "generated_images"
+CSV_PATH = "/processed_image_data.csv"
 
 # Tika API Endpoints (with verified working methods)
 TIKA_IMAGE_CAPTION_API = "http://localhost:8764/inception/v3/caption/image"
@@ -103,7 +103,7 @@ df["image_caption"] = captions
 df["image_metadata"] = objects_detected  
 
 # Save final dataset
-final_csv_path = "C:/Users/JasonUngheanu/Desktop/GeoTopicParser/haunted_places_v2.csv"
+final_csv_path = "haunted_places_final.csv"
 df.to_csv(final_csv_path, index=False)
 
 print(f"\nFinal dataset saved: {final_csv_path}")

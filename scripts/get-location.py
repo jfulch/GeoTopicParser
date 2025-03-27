@@ -61,9 +61,9 @@ def extract_locations(text):
 
 def main():
     # Read the TSV file
-    df = pd.read_csv('haunted_places_all_records_combined.tsv', sep='\t')
+    df = pd.read_csv('../haunted_places_all_records_combined.tsv', sep='\t')
     
-    # Limit to first 500 rows
+    # Limit to first X rows
     df = df.head(12000)
     
     # Create a copy of the dataframe to preserve the original
@@ -73,7 +73,7 @@ def main():
     augmented_df['extracted_location_name'] = None
     augmented_df['extracted_latitude'] = None
     augmented_df['extracted_longitude'] = None
-    augmented_df['location_source'] = None  # New column to track source
+    augmented_df['location_source'] = None  
     
     # List to store all found locations for CSV export
     all_locations = []
@@ -156,7 +156,7 @@ def main():
                     augmented_df.at[index, 'location_source'] = 'original'  # Location from original data
     
     # Save the augmented dataframe to a new TSV file
-    augmented_df.to_csv('haunted_places_augmented.tsv', sep='\t', index=False)
+    augmented_df.to_csv('../haunted_places_augmented.tsv', sep='\t', index=False)
     
     # Save ALL found locations to CSV
     if all_locations:

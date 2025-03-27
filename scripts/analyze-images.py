@@ -5,7 +5,7 @@ import json
 from PIL import Image
 
 # Local paths
-LOCAL_IMAGES_DIR = "generated_images"
+LOCAL_IMAGES_DIR = "../generated_images"
 CSV_PATH = "/processed_image_data.csv"
 
 # Tika API Endpoints (with verified working methods)
@@ -103,7 +103,7 @@ df["image_caption"] = captions
 df["image_metadata"] = objects_detected  
 
 # Save final dataset
-final_csv_path = "haunted_places_final.csv"
+final_csv_path = "../haunted_places_description.csv"
 df.to_csv(final_csv_path, index=False)
 
 print(f"\nFinal dataset saved: {final_csv_path}")

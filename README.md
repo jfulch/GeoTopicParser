@@ -1,6 +1,6 @@
 # GeoTopicParser
 
-## How to Run get-location.py
+## How to run get-location.py
 
 Before running the `get-location.py` you have to start the Tika server and the lucene-geo-gazetteer server, using the below commands.
 
